@@ -4,6 +4,10 @@ import { NavLink, Outlet } from 'react-router-dom'
 import ConnectWallet from './components/ConnectWallet'
 import ThemeToggle from './components/ThemeToggle'
 
+/**
+ * Main Layout Component
+ * Wraps the entire app with navigation, footer, and wallet connection modal
+ */
 export default function Layout() {
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const { activeAddress } = useWallet()

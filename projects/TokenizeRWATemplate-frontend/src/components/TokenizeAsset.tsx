@@ -6,6 +6,10 @@ import { AiOutlineInfoCircle, AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { BsCoin } from 'react-icons/bs'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
+/**
+ * Type for created assets stored in browser localStorage
+ * Captures all ASA configuration including compliance fields
+ */
 type CreatedAsset = {
   assetId: number
   assetName: string
@@ -23,6 +27,9 @@ type CreatedAsset = {
 const STORAGE_KEY = 'tokenize_assets'
 const LORA_BASE = 'https://lora.algokit.io/testnet'
 
+/**
+ * Load created assets from browser localStorage
+ */
 function loadAssets(): CreatedAsset[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -32,6 +39,10 @@ function loadAssets(): CreatedAsset[] {
   }
 }
 
+/**
+ * Save a newly created asset to localStorage
+ * Returns updated asset list with new asset at the top
+ */
 function persistAsset(asset: CreatedAsset): CreatedAsset[] {
   const existing = loadAssets()
   const next = [asset, ...existing]
@@ -39,6 +50,12 @@ function persistAsset(asset: CreatedAsset): CreatedAsset[] {
   return next
 }
 
+/**
+ * TokenizeAsset Component
+ * Main form for creating Algorand Standard Assets (ASAs)
+ * Collects basic and advanced compliance metadata
+ * Persists created assets to localStorage for tracking
+ */
 export default function TokenizeAsset() {
   const [assetName, setAssetName] = useState<string>('Tokenized Coffee Membership')
   const [unitName, setUnitName] = useState<string>('COFFEE')
@@ -84,6 +101,10 @@ export default function TokenizeAsset() {
 
   const isWholeNumber = (v: string) => /^\d+$/.test(v)
 
+  /**
+   * Handle ASA creation with validation and on-chain transaction
+   * Adjusts total supply by decimals and saves asset to localStorage
+   */
   const handleTokenize = async () => {
     if (!transactionSigner || !activeAddress) {
       enqueueSnackbar('Please connect your wallet first.', { variant: 'warning' })

@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react'
 const THEME_KEY = 'tokenize_theme'
 type Theme = 'light' | 'dark'
 
+/**
+ * Get initial theme preference from localStorage or system preference
+ */
 function getInitialTheme(): Theme {
   const saved = localStorage.getItem(THEME_KEY)
   if (saved === 'light' || saved === 'dark') return saved
@@ -10,6 +13,11 @@ function getInitialTheme(): Theme {
   return prefersDark ? 'dark' : 'light'
 }
 
+/**
+ * ThemeToggle Component
+ * Allows users to toggle between light and dark modes
+ * Persists theme preference to localStorage and applies Tailwind's dark class
+ */
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme())
   const [mounted, setMounted] = useState(false)

@@ -1,5 +1,9 @@
 import TokenizeAsset from './components/TokenizeAsset'
 
+/**
+ * Tokenize Page
+ * Main page for creating new Algorand Standard Assets (ASAs)
+ */
 export default function TokenizePage() {
   return (
     <div className="bg-white dark:bg-slate-950 min-h-screen py-12">

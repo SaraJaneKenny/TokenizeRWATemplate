@@ -1,6 +1,11 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import { Link } from 'react-router-dom'
 
+/**
+ * Home Page
+ * Landing page showcasing the RWA tokenization platform
+ * Displays features, how it works, and CTAs to connect wallet and create assets
+ */
 export default function Home() {
   const { activeAddress } = useWallet()
 
