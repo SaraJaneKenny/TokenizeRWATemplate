@@ -1,55 +1,171 @@
-# TokenizeRWATemplate
+# 🧱 RWA Tokenization Template (Algorand)
 
-This starter full stack project has been generated using AlgoKit. See below for default getting started instructions.
+A **beginner-friendly, end-to-end template** for tokenizing real-world assets (RWAs) on **Algorand testnet** using **Algorand Standard Assets (ASAs)**.
 
-## Setup
+This repository is designed for:
+- Founders exploring **RWA proofs-of-concept**
+- Builders new to Algorand
+- Hackathons, demos, workshops, and early product experiments
 
-### Initial setup
-1. Clone this repository to your local machine.
-2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
-3. Run `algokit project bootstrap all` in the project directory. This command sets up your environment by installing necessary dependencies, setting up a Python virtual environment, and preparing your `.env` file.
-4. In the case of a smart contract project, execute `algokit generate env-file -a target_network localnet` from the `TokenizeRWATemplate-contracts` directory to create a `.env.localnet` file with default configuration for `localnet`.
-5. To build your project, execute `algokit project run build`. This compiles your project and prepares it for running.
-6. For project-specific instructions, refer to the READMEs of the child projects:
-   - Smart Contracts: [TokenizeRWATemplate-contracts](projects/TokenizeRWATemplate-contracts/README.md)
-   - Frontend Application: [TokenizeRWATemplate-frontend](projects/TokenizeRWATemplate-frontend/README.md)
+No prior blockchain or smart contract experience required. By the end, you’ll have a working tokenized asset with a real Algorand Asset ID.
 
-> This project is structured as a monorepo, refer to the [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) to learn more about custom command orchestration via `algokit project run`.
+## ✨ What This Template Gives You
 
-### Subsequently
+- ✅ Full-stack Algorand project (frontend + backend)
+- ✅ Simple ASA creation flow for tokenizing assets
+- ✅ Wallet connect (Pera, Defly, Exodus, Lute)
+- ✅ Localnet and Testnet support
+- ✅ One-command setup using GitHub Codespaces
+- ✅ Clean foundation you can extend with compliance, metadata, or DeFi
 
-1. If you update to the latest source code and there are new dependencies, you will need to run `algokit project bootstrap all` again.
-2. Follow step 3 above.
+## 🧠 What “RWA Tokenization” Means Here
 
-### Continuous Integration / Continuous Deployment (CI/CD)
+This template focuses on the **on-chain token layer** of RWA tokenization:
 
-This project uses [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) to define CI/CD workflows, which are located in the [`.github/workflows`](./.github/workflows) folder. You can configure these actions to suit your project's needs, including CI checks, audits, linting, type checking, testing, and deployments to TestNet.
+- Each real-world asset is represented by an **Algorand Standard Asset (ASA)**
+- Ownership, supply, and transfers are handled on-chain
+- The real-world linkage (documents, custody, legal structure) lives **off-chain**
 
-For pushes to `main` branch, after the above checks pass, the following deployment actions are performed:
-  - The smart contract(s) are deployed to TestNet using [AlgoNode](https://algonode.io).
-  - The frontend application is deployed to a provider of your choice (Netlify, Vercel, etc.). See [frontend README](frontend/README.md) for more information.
+> ⚠️ This is a **technical proof-of-concept template**, not legal or financial advice.
 
-> Please note deployment of smart contracts is done via `algokit deploy` command which can be invoked both via CI as seen on this project, or locally. For more information on how to use `algokit deploy` please see [AlgoKit documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/deploy.md).
+## 🚀 Getting Started (5 Minutes)
 
-## Tools
+### Option 1: GitHub Codespaces (Recommended)
 
-This project makes use of Python and React to build Algorand smart contracts and to provide a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
+This is the **fastest and easiest** way to run the project.
 
-- Algorand, AlgoKit, and AlgoKit Utils
-- Python dependencies including Poetry, Black, Ruff or Flake8, mypy, pytest, and pip-audit
-- React and related dependencies including AlgoKit Utils, Tailwind CSS, daisyUI, use-wallet, npm, jest, playwright, Prettier, ESLint, and Github Actions workflows for build validation
+### 1️⃣ Fork the repository
 
-### VS Code
+Click **Fork** (top-right of this page) to create your own copy.
 
-It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [backend .vscode](./backend/.vscode) and [frontend .vscode](./frontend/.vscode) folders for more details.
+https://github.com/user-attachments/assets/92e746e1-3143-4769-8a5a-1339e4bd7a14
 
-## Integrating with smart contracts and application clients
+### 2️⃣ Open in Codespaces
 
-Refer to the [TokenizeRWATemplate-contracts](projects/TokenizeRWATemplate-contracts/README.md) folder for overview of working with smart contracts, [projects/TokenizeRWATemplate-frontend](projects/TokenizeRWATemplate-frontend/README.md) for overview of the React project and the [projects/TokenizeRWATemplate-frontend/contracts](projects/TokenizeRWATemplate-frontend/src/contracts/README.md) folder for README on adding new smart contracts from backend as application clients on your frontend. The templates provided in these folders will help you get started.
-When you compile and generate smart contract artifacts, your frontend component will automatically generate typescript application clients from smart contract artifacts and move them to `frontend/src/contracts` folder, see [`generate:app-clients` in package.json](projects/TokenizeRWATemplate-frontend/package.json). Afterwards, you are free to import and use them in your frontend application.
+1. Go to your forked repository
+2. Click **Code → Codespaces → Create codespace**
+3. Wait for the environment to start
 
-The frontend starter also provides an example of interactions with your HelloWorldClient in [`AppCalls.tsx`](projects/TokenizeRWATemplate-frontend/src/components/AppCalls.tsx) component by default.
+> When the Codespace loads, you may see an **“Open Workspace?”** popup in the bottom-right — click **Yes**.
 
-## Next Steps
+Or manually enter it like below:
+<img width="2794" height="1524" alt="image" src="https://github.com/user-attachments/assets/41f25490-1284-4998-b342-27f7a0ffb420" />
 
-You can take this project and customize it to build your own decentralized applications on Algorand. Make sure to understand how to use AlgoKit and how to write smart contracts for Algorand before you start.
+### 3️⃣ Configure the frontend environment
+
+1. Navigate to the `frontend` folder
+2. Find the file:
+`.env.template`
+3. Copy **all** of its contents
+4. Create a new file called:
+`.env`
+5. Paste the contents into `.env` and save
+
+### 4️⃣ Run the setup script
+
+In the Codespaces terminal, run:
+
+```bash
+bash setup.sh
+```
+This script will:
+- Install dependencies
+- Launch the frontend automatically
+
+👉 When it finishes, a web app link will open automatically in Codespaces.
+
+## Pro Tip!
+> GitHub Codespaces includes 60 free hours per month.
+> Commit your changes regularly to avoid losing progress.
+
+https://github.com/user-attachments/assets/dd452ea1-3070-4718-af34-bea978e208ab
+
+## 🌐 Running the Frontend Again
+
+After running setup.sh once, you have two options whenever you open your codespace if you don't want to run the setup script again:
+
+### Option A: Terminal
+```bash
+cd frontend
+```
+then,
+```bash
+npm run dev
+```
+
+### Option B: GitHub UI
+You can also start the frontend directly using the GitHub Codespaces UI, which is useful for demos and workshops.
+
+## 🪙 Tokenization Flow (High Level)
+
+This template guides you through the core steps of tokenizing a real-world asset on Algorand using **Algorand Standard Assets (ASAs)**.
+
+### Basic Flow
+
+1. **Connect a wallet**  
+   Connect an Algorand wallet (e.g. Pera, Defly, Lute) to interact with the app.
+
+2. **Define your asset parameters**  
+   Choose the asset name, unit name, total supply, decimals, and optional metadata.
+
+3. **Create an Algorand Standard Asset (ASA)**  
+   The asset is created on-chain and represents your real-world asset digitally.
+
+4. **Receive an Asset ID**  
+   Algorand assigns a unique **Asset ID**, which becomes the on-chain identifier for your tokenized asset.
+
+5. **Use or extend the token as your RWA representation**  
+   The ASA can now be transferred, held, integrated into apps, or extended with additional logic.
+
+### Advanced Asset Controls (Optional)
+
+ASAs support **advanced management features** commonly used in RWA and compliance-focused setups:
+
+- **Manager**  
+  Can update asset configuration or rotate control roles (useful for governance or upgrades).
+
+- **Reserve**  
+  Holds uncirculated supply, enabling controlled distribution or staged issuance.
+
+- **Freeze**  
+  Can freeze transfers for specific accounts (e.g. during compliance checks or disputes).
+
+- **Clawback**  
+  Allows reclaiming tokens from accounts if required (often used for regulatory or recovery scenarios).
+
+> These controls are optional and can be enabled or disabled depending on your use case and trust model.
+
+### What This Enables
+
+This tokenization flow forms the foundation for:
+
+- Fractional ownership of real-world assets
+- On-chain asset registries
+- Access or entitlement tokens
+- Membership or investment models
+- Compliance-aware or permissioned asset designs
+
+This template focuses on giving you a **clean, flexible starting point** — you decide how advanced or permissioned your tokenization POC needs to be.
+
+## 🧪 Disclaimer
+
+This repository is provided for **educational and experimental purposes only**.  
+It does **not** constitute legal, financial, or investment advice.
+
+Below are videos on:
+- How to connect to Testnet on Pera
+- How to use the Algo Dispenser
+- How to use the USDC Dispenser
+
+**How to connect to testnet on Pera Wallet**
+
+https://github.com/user-attachments/assets/31df8135-119e-4529-9539-4943de979719
+
+**How to use the Algo Dispenser**
+
+https://github.com/user-attachments/assets/643cae10-4673-4b68-8e95-4a3f16fbba60
+
+**How to use the USDC Dispenser**
+
+https://github.com/user-attachments/assets/a76e90fa-97f4-44f8-a7e8-a8ccabd24398
+
