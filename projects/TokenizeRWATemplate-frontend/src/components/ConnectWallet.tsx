@@ -9,7 +9,6 @@ interface ConnectWalletInterface {
 }
 
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
-  // Destructure the new clean methods from your unified hook
   const { isConnected, walletType, userInfo, traditionalWallets, connectGoogle, connectFacebook, connectGithub, disconnect } =
     useUnifiedWallet()
 
@@ -19,12 +18,10 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
   const handleSocialLogin = async (provider: SocialLoginProvider, connectFn: () => Promise<void>) => {
     try {
       setConnectingProvider(provider)
-      await connectFn() // Bypasses the Web3Auth modal
+      await connectFn()
       closeModal()
     } catch (error) {
-      console.error(`${provider} login failed`, error)
-    } finally {
-      setConnectingProvider(null)
+      throw new Error(`Failed to connect with ${provider}: ${error}`)
     }
   }
 
