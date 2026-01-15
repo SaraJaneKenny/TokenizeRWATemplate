@@ -64,6 +64,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
             console.error('🎯 Failed to fetch user info:', err)
           }
         }
+
         setIsInitialized(true)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to initialize Web3Auth'
@@ -125,6 +126,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       setIsConnected(false)
       setProvider(null)
       setAlgorandAccount(null)
+      setUserInfo(null)
     } finally {
       setIsLoading(false)
     }
@@ -137,10 +139,18 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 
       await logoutFromWeb3Auth()
 
+      // Clear React state
       setProvider(null)
       setIsConnected(false)
       setAlgorandAccount(null)
       setUserInfo(null)
+
+      /**
+       * ✅ Fix A (most reliable for templates):
+       * Force a full refresh after logout so Web3Auth doesn't get stuck
+       * in an in-between cached state (e.g. button stuck on "Connecting...").
+       */
+      window.location.reload()
     } catch (err) {
       console.error('🎯 LOGOUT: Error:', err)
       setError(err instanceof Error ? err.message : 'Logout failed')

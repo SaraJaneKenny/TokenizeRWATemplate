@@ -12,9 +12,7 @@ import { useWeb3Auth } from './Web3AuthProvider'
  * Features:
  * - Wallet connection/disconnection with Web3Auth (Google OAuth)
  * - Auto-generation of Algorand wallet from Google credentials
- * - Ellipsized address display for better UX
  * - Loading states and error handling
- * - Beautiful Google-style sign-in button
  *
  * Usage:
  * ```tsx
@@ -25,6 +23,9 @@ export function Web3AuthButton() {
   const { isConnected, isLoading, error, algorandAccount, userInfo, login, logout } = useWeb3Auth()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  // Lora explorer base (TestNet)
+  const LORA_ACCOUNT_BASE = 'https://lora.algokit.io/testnet/account'
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,22 +43,10 @@ export function Web3AuthButton() {
   // Get address as string safely
   const getAddressString = (): string => {
     if (!algorandAccount?.address) return ''
-
-    // Handle if address is an object (like from algosdk with publicKey property)
-    if (typeof algorandAccount.address === 'object' && algorandAccount.address !== null) {
-      // If it has a toString method, use it
-      if ('toString' in algorandAccount.address && typeof algorandAccount.address === 'function') {
-        return algorandAccount.address
-      }
-      // If it has an addr property (algosdk Account object)
-      if ('addr' in algorandAccount.address) {
-        return String(algorandAccount.address)
-      }
-      return ''
-    }
-
     return String(algorandAccount.address)
   }
+
+  const getLoraAccountUrl = (address: string) => `${LORA_ACCOUNT_BASE}/${address}`
 
   // Handle login with error feedback
   const handleLogin = async () => {
@@ -135,13 +124,14 @@ export function Web3AuthButton() {
   if (algorandAccount && isConnected) {
     const address = getAddressString()
     const firstLetter = address ? address[0].toUpperCase() : 'A'
+    const loraUrl = address ? getLoraAccountUrl(address) : '#'
 
     return (
       <div className="dropdown dropdown-end" data-dropdown>
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="btn btn-sm btn-ghost gap-2 hover:bg-base-200"
-          title={`Connected: ${address} ${userInfo?.email}`}
+          title={`Connected: ${address} ${userInfo?.email ?? ''}`}
         >
           <div className="flex items-center gap-2">
             {/* Profile picture - always show first letter of address */}
@@ -156,7 +146,10 @@ export function Web3AuthButton() {
                 {firstLetter}
               </div>
             )}
+
+            {/* Keep address visible in navbar, but not a link here (button toggles dropdown) */}
             <span className="font-mono text-sm font-medium">{address}</span>
+
             <svg
               className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
               fill="none"
@@ -176,7 +169,11 @@ export function Web3AuthButton() {
                 <li className="menu-title px-3 py-2">
                   <div className="flex items-center gap-3">
                     {userInfo.profileImage ? (
-                      <img src={userInfo.profileImage} alt="Profile" className="w-10 h-10 rounded-full object-cover ring-2 ring-primary" />
+                      <img
+                        src={userInfo.profileImage}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-primary"
+                      />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center text-lg font-bold">
                         {firstLetter}
@@ -196,8 +193,20 @@ export function Web3AuthButton() {
             <li className="menu-title px-3">
               <span className="text-xs uppercase">Algorand Address</span>
             </li>
+
+            {/* Clickable address -> Lora */}
             <li>
-              <div className="bg-base-200 rounded-lg p-2 font-mono text-xs break-all cursor-default hover:bg-base-200">{address}</div>
+              <a
+                href={loraUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-base-200 rounded-lg p-2 font-mono text-xs break-all hover:bg-base-300 transition"
+                title="View account on Lora explorer"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                {address}
+                <span className="ml-2 opacity-70">↗</span>
+              </a>
             </li>
 
             {/* Copy Address Button */}
@@ -215,6 +224,21 @@ export function Web3AuthButton() {
                   </>
                 )}
               </button>
+            </li>
+
+            {/* Explicit "View on Lora" CTA (extra clarity) */}
+            <li>
+              <a
+                href={loraUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm gap-2"
+                title="Open in Lora explorer"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <span>View on Lora</span>
+                <span className="opacity-70">↗</span>
+              </a>
             </li>
 
             <div className="divider my-1"></div>
