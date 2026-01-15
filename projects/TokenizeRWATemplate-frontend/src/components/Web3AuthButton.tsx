@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
-import { FaGoogle, FaCopy, FaCheck } from 'react-icons/fa'
+import { FaCheck, FaCopy, FaGoogle } from 'react-icons/fa'
 import { useWeb3Auth } from './Web3AuthProvider'
 
 /**
@@ -46,25 +46,17 @@ export function Web3AuthButton() {
     // Handle if address is an object (like from algosdk with publicKey property)
     if (typeof algorandAccount.address === 'object' && algorandAccount.address !== null) {
       // If it has a toString method, use it
-      if ('toString' in algorandAccount.address && typeof algorandAccount.address.toString === 'function') {
-        return algorandAccount.address.toString()
+      if ('toString' in algorandAccount.address && typeof algorandAccount.address === 'function') {
+        return algorandAccount.address
       }
       // If it has an addr property (algosdk Account object)
       if ('addr' in algorandAccount.address) {
-        return String(algorandAccount.address.addr)
+        return String(algorandAccount.address)
       }
       return ''
     }
 
     return String(algorandAccount.address)
-  }
-
-  // Ellipsize long addresses for better UI
-  const ellipseAddress = (address: string = '', startChars = 6, endChars = 4): string => {
-    if (!address || address.length <= startChars + endChars) {
-      return address
-    }
-    return `${address.slice(0, startChars)}...${address.slice(-endChars)}`
   }
 
   // Handle login with error feedback
@@ -149,7 +141,7 @@ export function Web3AuthButton() {
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="btn btn-sm btn-ghost gap-2 hover:bg-base-200"
-          title={`Connected: ${address}`}
+          title={`Connected: ${address} ${userInfo?.email}`}
         >
           <div className="flex items-center gap-2">
             {/* Profile picture - always show first letter of address */}
@@ -164,7 +156,7 @@ export function Web3AuthButton() {
                 {firstLetter}
               </div>
             )}
-            <span className="font-mono text-sm font-medium">{ellipseAddress(address)}</span>
+            <span className="font-mono text-sm font-medium">{address}</span>
             <svg
               className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
               fill="none"
@@ -184,23 +176,15 @@ export function Web3AuthButton() {
                 <li className="menu-title px-3 py-2">
                   <div className="flex items-center gap-3">
                     {userInfo.profileImage ? (
-                      <img
-                        src={userInfo.profileImage}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full object-cover ring-2 ring-primary"
-                      />
+                      <img src={userInfo.profileImage} alt="Profile" className="w-10 h-10 rounded-full object-cover ring-2 ring-primary" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center text-lg font-bold">
                         {firstLetter}
                       </div>
                     )}
                     <div className="flex flex-col">
-                      {userInfo.name && (
-                        <span className="font-semibold text-base-content">{userInfo.name}</span>
-                      )}
-                      {userInfo.email && (
-                        <span className="text-xs text-base-content/70 break-all">{userInfo.email}</span>
-                      )}
+                      {userInfo.name && <span className="font-semibold text-base-content">{userInfo.name}</span>}
+                      {userInfo.email && <span className="text-xs text-base-content/70 break-all">{userInfo.email}</span>}
                     </div>
                   </div>
                 </li>
@@ -213,17 +197,12 @@ export function Web3AuthButton() {
               <span className="text-xs uppercase">Algorand Address</span>
             </li>
             <li>
-              <div className="bg-base-200 rounded-lg p-2 font-mono text-xs break-all cursor-default hover:bg-base-200">
-                {address}
-              </div>
+              <div className="bg-base-200 rounded-lg p-2 font-mono text-xs break-all cursor-default hover:bg-base-200">{address}</div>
             </li>
 
             {/* Copy Address Button */}
             <li>
-              <button
-                onClick={handleCopyAddress}
-                className="text-sm gap-2"
-              >
+              <button onClick={handleCopyAddress} className="text-sm gap-2">
                 {copied ? (
                   <>
                     <FaCheck className="text-success" />
@@ -242,11 +221,7 @@ export function Web3AuthButton() {
 
             {/* Disconnect Button */}
             <li>
-              <button
-                onClick={handleLogout}
-                disabled={isLoading}
-                className="text-sm text-error hover:bg-error/10 gap-2"
-              >
+              <button onClick={handleLogout} disabled={isLoading} className="text-sm text-error hover:bg-error/10 gap-2">
                 {isLoading ? (
                   <>
                     <AiOutlineLoading3Quarters className="animate-spin" />
@@ -255,7 +230,12 @@ export function Web3AuthButton() {
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
                     </svg>
                     <span>Disconnect</span>
                   </>
