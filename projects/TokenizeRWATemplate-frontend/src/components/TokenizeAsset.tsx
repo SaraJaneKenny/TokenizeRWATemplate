@@ -649,6 +649,27 @@ export default function TokenizeAsset() {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Tokenize on Algorand</h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Mint standard ASAs or mint an NFT-style ASA on TestNet.</p>
+            {/* TestNet funding helper */}
+            <div className="mt-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="text-sm text-slate-700 dark:text-slate-200">
+                  Need TestNet ALGO to get started? Use the Algorand TestNet Dispenser.
+                  <span className="block text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Tip: fund the connected address, then refresh your balance.
+                  </span>
+                </div>
+
+                <a
+                  href="https://bank.testnet.algorand.network/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-md transition"
+                >
+                  Open Dispenser ↗
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1143,6 +1164,26 @@ export default function TokenizeAsset() {
         <div className="mt-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg p-6 sm:p-8">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Transfer</h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">Send ALGO, USDC, or any ASA (including NFTs) to another wallet.</p>
+          {/* TestNet USDC helper */}
+          <div className="mb-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="text-sm text-slate-700 dark:text-slate-200">
+                Need TestNet USDC? Use Circle’s faucet, then transfer it like any ASA.
+                <span className="block text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Note: you may need to opt-in to the USDC asset before receiving it.
+                </span>
+              </div>
+
+              <a
+                href="https://faucet.circle.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-md transition"
+              >
+                Open USDC Faucet ↗
+              </a>
+            </div>
+          </div>
 
           {/* Mode selector */}
           <div className="mb-5">
