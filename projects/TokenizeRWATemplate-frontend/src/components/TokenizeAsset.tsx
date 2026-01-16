@@ -4,8 +4,8 @@ import { useSnackbar } from 'notistack'
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlineCloudUpload, AiOutlineInfoCircle, AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { BsCoin } from 'react-icons/bs'
-import { useUnifiedWallet } from '../hooks/useUnifiedWallet'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 /**
  * Type for created assets stored in browser localStorage
@@ -175,8 +175,12 @@ export default function TokenizeAsset() {
   const [nftFreeze, setNftFreeze] = useState<string>('')
   const [nftClawback, setNftClawback] = useState<string>('')
 
-  // ===== Unified wallet (Web3Auth OR WalletConnect) =====
-  const { signer, activeAddress } = useUnifiedWallet()
+  // ===== use-wallet (Web3Auth OR WalletConnect) =====
+  // Use transactionSigner (not signer) - this is the correct property name from use-wallet
+  const { transactionSigner, activeAddress } = useWallet()
+  
+  // Alias for backward compatibility in the code
+  const signer = transactionSigner
 
   // ===== Notifications =====
   const { enqueueSnackbar } = useSnackbar()
@@ -283,7 +287,6 @@ export default function TokenizeAsset() {
       setHasCheckedUsdcOnChain(true)
       hasCheckedUsdcOnChainRef.current = true
     } catch (e) {
-      console.error('Failed to check USDC opt-in', e)
       // On error, set to not-opted-in but don't mark as checked
       // This allows retry on next render cycle
       setUsdcStatus('not-opted-in')
@@ -385,8 +388,15 @@ export default function TokenizeAsset() {
    * Opt-in is an asset transfer of 0 USDC to self
    */
   const handleOptInUsdc = async () => {
-    if (!signer || !activeAddress) {
+    // Check for activeAddress first (primary indicator of connection)
+    // transactionSigner might be available even if not explicitly set
+    if (!activeAddress) {
       enqueueSnackbar('Please connect a wallet or continue with Google first.', { variant: 'warning' })
+      return
+    }
+    
+    if (!signer) {
+      enqueueSnackbar('Wallet signer not available. Please try reconnecting your wallet.', { variant: 'error' })
       return
     }
 
@@ -438,7 +448,6 @@ export default function TokenizeAsset() {
         checkUsdcOptInStatus()
       }, 2000)
     } catch (e) {
-      console.error('USDC opt-in failed', e)
       enqueueSnackbar('USDC opt-in failed.', { variant: 'error' })
     } finally {
       setUsdcOptInLoading(false)
@@ -515,8 +524,14 @@ export default function TokenizeAsset() {
    * Adjusts total supply by decimals and saves asset to localStorage
    */
   const handleTokenize = async () => {
-    if (!signer || !activeAddress) {
+    // Check for activeAddress first (primary indicator of connection)
+    if (!activeAddress) {
       enqueueSnackbar('Please connect a wallet or continue with Google first.', { variant: 'warning' })
+      return
+    }
+    
+    if (!signer) {
+      enqueueSnackbar('Wallet signer not available. Please try reconnecting your wallet.', { variant: 'error' })
       return
     }
 
@@ -596,7 +611,6 @@ export default function TokenizeAsset() {
 
       resetDefaults()
     } catch (error) {
-      console.error(error)
       enqueueSnackbar('Failed to tokenize asset (ASA creation failed).', { variant: 'error' })
     } finally {
       setLoading(false)
@@ -608,8 +622,14 @@ export default function TokenizeAsset() {
    * Handles validation, amount conversion, and transaction submission
    */
   const handleTransferAsset = async () => {
-    if (!signer || !activeAddress) {
+    // Check for activeAddress first (primary indicator of connection)
+    if (!activeAddress) {
       enqueueSnackbar('Please connect a wallet or continue with Google first.', { variant: 'warning' })
+      return
+    }
+    
+    if (!signer) {
+      enqueueSnackbar('Wallet signer not available. Please try reconnecting your wallet.', { variant: 'error' })
       return
     }
 
@@ -762,7 +782,6 @@ export default function TokenizeAsset() {
       setReceiverAddress('')
       setTransferAmount('1')
     } catch (error) {
-      console.error('Transfer failed', error)
       if (transferMode === 'algo') {
         enqueueSnackbar('ALGO send failed.', { variant: 'error' })
       } else {
@@ -787,8 +806,14 @@ export default function TokenizeAsset() {
   const handleDivClick = () => fileInputRef.current?.click()
 
   const handleMintNFT = async () => {
-    if (!signer || !activeAddress) {
+    // Check for activeAddress first (primary indicator of connection)
+    if (!activeAddress) {
       enqueueSnackbar('Please connect a wallet or continue with Google first.', { variant: 'warning' })
+      return
+    }
+    
+    if (!signer) {
+      enqueueSnackbar('Wallet signer not available. Please try reconnecting your wallet.', { variant: 'error' })
       return
     }
 
@@ -843,7 +868,6 @@ export default function TokenizeAsset() {
       metadataUrl = data.metadataUrl
       if (!metadataUrl) throw new Error('Backend did not return a valid metadata URL')
     } catch (e: any) {
-      console.error(e)
       enqueueSnackbar('Error uploading to backend. If in Codespaces, make port 3001 Public.', { variant: 'error' })
       setNftLoading(false)
       return
@@ -917,7 +941,6 @@ export default function TokenizeAsset() {
       setPreviewUrl('')
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (e: any) {
-      console.error(e)
       enqueueSnackbar(`Failed to mint NFT: ${e?.message || 'Unknown error'}`, { variant: 'error' })
     } finally {
       setNftLoading(false)

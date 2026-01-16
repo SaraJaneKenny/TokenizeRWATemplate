@@ -7,9 +7,19 @@ export default defineConfig({
   plugins: [
     react(),
     nodePolyfills({
-      globals: {
-        Buffer: true,
-      },
+      protocolImports: true,
     }),
   ],
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
 })

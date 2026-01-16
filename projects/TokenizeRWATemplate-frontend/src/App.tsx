@@ -1,71 +1,99 @@
 import { SupportedWallet, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
 import { SnackbarProvider } from 'notistack'
+import { useMemo } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Web3AuthProvider } from './components/Web3AuthProvider'
 import Home from './Home'
 import Layout from './Layout'
 import TokenizePage from './TokenizePage'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
-// Configure supported wallets based on network environment
-let supportedWallets: SupportedWallet[]
-if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
-  // LocalNet: KMD wallet for local development
-  const kmdConfig = getKmdConfigFromViteEnvironment()
-  supportedWallets = [
-    {
-      id: WalletId.KMD,
-      options: {
-        baseServer: kmdConfig.server,
-        token: String(kmdConfig.token),
-        port: String(kmdConfig.port),
-      },
-    },
-    { id: WalletId.LUTE },
-  ]
-} else {
-  // TestNet/MainNet: Browser extension wallets (Pera, Defly, Exodus, Lute)
-  supportedWallets = [{ id: WalletId.DEFLY }, { id: WalletId.PERA }, { id: WalletId.EXODUS }, { id: WalletId.LUTE }]
-}
+// Get Web3Auth client ID from environment
+const web3AuthClientId = (import.meta.env.VITE_WEB3AUTH_CLIENT_ID ?? '').trim()
 
 /**
- * Main App Component
- * Sets up wallet provider and routing for the Tokenization dApp
+ * Build supported wallets list based on env/network.
+ * NOTE: Web3Auth defaults to sapphire_mainnet unless web3AuthNetwork is provided.
  */
+function buildSupportedWallets(): SupportedWallet[] {
+  if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
+    const kmdConfig = getKmdConfigFromViteEnvironment()
+    return [
+      {
+        id: WalletId.KMD,
+        options: {
+          baseServer: kmdConfig.server,
+          token: String(kmdConfig.token),
+          port: String(kmdConfig.port),
+        },
+      },
+      { id: WalletId.LUTE },
+    ]
+  }
+
+  // TestNet/MainNet wallets
+  const wallets: SupportedWallet[] = [{ id: WalletId.PERA }, { id: WalletId.DEFLY }, { id: WalletId.LUTE }]
+
+  // Only add Web3Auth if we actually have a client id
+  // use-wallet v4.4.0+ includes built-in Web3Auth provider
+  if (web3AuthClientId) {
+    wallets.push({
+      id: WalletId.WEB3AUTH,
+      options: {
+        clientId: web3AuthClientId,
+        // Web3Auth network: 'sapphire_devnet' for development, 'sapphire_mainnet' for production
+        web3AuthNetwork: 'sapphire_devnet',
+        // Optional: Set default login provider (e.g., 'google' for direct Google login)
+        // If not set, shows full provider selection modal
+        // loginProvider: 'google',
+        // Optional: UI customization
+        uiConfig: {
+          appName: 'Tokenize RWA Template',
+          mode: 'auto', // 'auto' | 'light' | 'dark'
+        },
+      },
+    })
+  }
+
+  return wallets
+}
+
 export default function App() {
   const algodConfig = getAlgodConfigFromViteEnvironment()
 
-  const walletManager = new WalletManager({
-    wallets: supportedWallets,
-    defaultNetwork: algodConfig.network,
-    networks: {
-      [algodConfig.network]: {
-        algod: {
-          baseServer: algodConfig.server,
-          port: algodConfig.port,
-          token: String(algodConfig.token),
+  const supportedWallets = useMemo(() => buildSupportedWallets(), [])
+  const walletManager = useMemo(() => {
+    const mgr = new WalletManager({
+      wallets: supportedWallets,
+      defaultNetwork: algodConfig.network,
+      networks: {
+        [algodConfig.network]: {
+          algod: {
+            baseServer: algodConfig.server,
+            port: algodConfig.port,
+            token: String(algodConfig.token),
+          },
         },
       },
-    },
-    options: {
-      resetNetwork: true,
-    },
-  })
+      options: {
+        resetNetwork: true,
+      },
+    })
+
+    return mgr
+  }, [algodConfig.network, algodConfig.server, algodConfig.port, algodConfig.token, supportedWallets])
 
   return (
     <SnackbarProvider maxSnack={3}>
-      <Web3AuthProvider>
-        <WalletProvider manager={walletManager}>
-          <BrowserRouter>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/tokenize" element={<TokenizePage />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </WalletProvider>
-      </Web3AuthProvider>
+      <WalletProvider manager={walletManager}>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/tokenize" element={<TokenizePage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </WalletProvider>
     </SnackbarProvider>
   )
 }

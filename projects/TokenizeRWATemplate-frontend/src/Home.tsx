@@ -1,4 +1,4 @@
-import { useUnifiedWallet } from './hooks/useUnifiedWallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 import { Link } from 'react-router-dom'
 
 /**
@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
  * Displays features, how it works, and CTAs to connect wallet and create assets
  */
 export default function Home() {
-const { activeAddress } = useUnifiedWallet()
+  const { activeAddress } = useWallet()
 
   return (
     <div className="bg-white dark:bg-slate-950">

@@ -1,5 +1,5 @@
+import { useWallet } from '@txnlab/use-wallet-react'
 import { useMemo, useState } from 'react'
-import { useUnifiedWallet } from '../hooks/useUnifiedWallet'
 import { ellipseAddress } from '../utils/ellipseAddress'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
@@ -10,13 +10,13 @@ import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClien
  * and current network.
  *
  * Works for BOTH:
- * - Web3Auth (Google login)
+ * - Web3Auth (Google login via use-wallet)
  * - Traditional wallets (Pera / Defly / etc)
  *
  * Address links to Lora explorer.
  */
 const Account = () => {
-  const { activeAddress } = useUnifiedWallet()
+  const { activeAddress } = useWallet()
   const algoConfig = getAlgodConfigFromViteEnvironment()
   const [copied, setCopied] = useState(false)
 
@@ -25,7 +25,7 @@ const Account = () => {
     return algoConfig.network === '' ? 'localnet' : algoConfig.network.toLowerCase()
   }, [algoConfig.network])
 
-  // Normalize address to string (VERY IMPORTANT)
+  // Normalize address to string safely
   const address = typeof activeAddress === 'string' ? activeAddress : activeAddress ? String(activeAddress) : null
 
   if (!address) {
@@ -40,7 +40,6 @@ const Account = () => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch (e) {
-      console.error('Failed to copy address', e)
     }
   }
 

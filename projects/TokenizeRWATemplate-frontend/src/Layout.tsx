@@ -1,18 +1,22 @@
+import { useWallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import ConnectWallet from './components/ConnectWallet'
 import ThemeToggle from './components/ThemeToggle'
-import { useUnifiedWallet } from './hooks/useUnifiedWallet'
+import { ellipseAddress } from './utils/ellipseAddress'
 
 export default function Layout() {
   const [openWalletModal, setOpenWalletModal] = useState(false)
-  const { isConnected, activeAddress, userInfo } = useUnifiedWallet()
+  const { activeAddress, isActive } = useWallet()
 
   const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
 
+  // Check if wallet is connected - activeAddress is the primary indicator
+  // isActive might be undefined for Web3Auth, so we check activeAddress
+  const isConnected = Boolean(activeAddress)
+
   // Helper to format address: "ZBC...WXYZ"
-  const displayAddress =
-    isConnected && activeAddress ? `${activeAddress.toString().slice(0, 4)}...${activeAddress.toString().slice(-4)}` : 'Sign in'
+  const displayAddress = isConnected && activeAddress ? ellipseAddress(activeAddress, 4) : 'Sign in'
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
@@ -41,7 +45,7 @@ export default function Layout() {
           <div className="flex items-center gap-4">
             <ThemeToggle />
 
-            {/* ONE Button to Rule Them All */}
+            {/* Sign In / Account Button */}
             <button
               onClick={toggleWalletModal}
               className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm border ${
@@ -61,7 +65,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Footer (Simplified) */}
+      {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-12 px-6 border-t border-slate-800">
         <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3">
           <div>
@@ -78,7 +82,7 @@ export default function Layout() {
         </div>
       </footer>
 
-      {/* The Unified Modal */}
+      {/* Wallet Modal */}
       <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
     </div>
   )
