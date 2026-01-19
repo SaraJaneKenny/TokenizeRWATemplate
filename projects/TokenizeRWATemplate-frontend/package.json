@@ -60,16 +60,10 @@
     "tweetnacl": "^1.0.3"
   },
   "scripts": {
+    "dev": "vite",
     "generate:app-clients": "algokit project link --all",
-    "dev": "npm run generate:app-clients && vite",
-    "build": "npm run generate:app-clients && tsc && vite build",
-    "test": "jest --coverage --passWithNoTests",
-    "playwright:test": "playwright test",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
-    "ci:vercel:build": "vercel build --prod --token=$VERCEL_TOKEN",
-    "ci:vercel:pull": "vercel pull --yes --environment=production --token=$VERCEL_TOKEN",
-    "ci:vercel:deploy": "npm run ci:vercel:build && vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN",
+    "build:dev": "npm run generate:app-clients && tsc && vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "eslintConfig": {
