@@ -1,4 +1,4 @@
-// Shared Express app (no .listen here)
+// app.js (PURE JS - no TS syntax)
 import pinataSDK from '@pinata/sdk'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -11,19 +11,14 @@ dotenv.config()
 
 const app = express()
 
-// --- DEBUG: log every request (shows up in Vercel function logs)
+// --- DEBUG: log every request (shows up in Vercel logs)
 app.use((req, _res, next) => {
   console.log(`[REQ] ${req.method} ${req.url} origin=${req.headers.origin || 'none'}`)
   next()
 })
 
-
 /**
  * CORS
- * - Allows localhost dev
- * - Allows your main frontend(s) via ALLOWED_ORIGINS
- * - Allows ANY *.vercel.app (so forks work for non-technical founders)
- *
  * Optional: set ALLOWED_ORIGINS in Vercel env as comma-separated list
  * Example:
  *   ALLOWED_ORIGINS=https://tokenize-rwa-template.vercel.app,http://localhost:5173
@@ -33,33 +28,24 @@ const explicitAllowed = (process.env.ALLOWED_ORIGINS || '')
   .map((s) => s.trim())
   .filter(Boolean)
 
-function isAllowedOrigin(origin: string) {
-  // explicitly allowed
+function isAllowedOrigin(origin) {
   if (explicitAllowed.includes('*')) return true
   if (explicitAllowed.includes(origin)) return true
-
-  // local dev
   if (origin === 'http://localhost:5173') return true
 
-  // allow any Vercel preview/prod frontend (great for forks)
   try {
     const host = new URL(origin).hostname
     if (host.endsWith('.vercel.app')) return true
   } catch {
-    // ignore bad origins
+    // ignore
   }
-
   return false
 }
 
-const corsOptions: cors.CorsOptions = {
+const corsOptions = {
   origin: (origin, cb) => {
-    // allow server-to-server / curl / same-origin (no Origin header)
     if (!origin) return cb(null, true)
-
     if (isAllowedOrigin(origin)) return cb(null, true)
-
-    // IMPORTANT: return an error (not "false") so it's obvious in logs/debugging
     return cb(new Error(`CORS blocked for origin: ${origin}`))
   },
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -71,7 +57,6 @@ const corsOptions: cors.CorsOptions = {
 // Apply CORS to all routes
 app.use(cors(corsOptions))
 
-// Handle preflight requests for ALL routes (with the SAME options)
 app.options('*', cors(corsOptions))
 
 app.use(express.json())
@@ -82,17 +67,17 @@ const pinata =
     ? new pinataSDK({ pinataJWTKey: process.env.PINATA_JWT })
     : new pinataSDK(process.env.PINATA_API_KEY || '', process.env.PINATA_API_SECRET || '')
 
-// Optional: test credentials at cold start (helps a LOT on Vercel)
+// Optional: test credentials at cold start
 ;(async () => {
   try {
-    const auth = await (pinata as any).testAuthentication?.()
+    const auth = await pinata.testAuthentication?.()
     console.log('Pinata auth OK:', auth || 'ok')
   } catch (e) {
     console.error('Pinata authentication FAILED. Check env vars.', e)
   }
 })()
 
-// Uploads (multipart/form-data)
+// Uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
@@ -103,11 +88,21 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ ok: true, ts: Date.now() })
 })
 
-function safeTrim(v: unknown) {
+// DEBUG ROUTE
+app.get('/api/debug', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: 'Reached Express',
+    url: req.url,
+    origin: req.headers.origin || null,
+  })
+})
+
+function safeTrim(v) {
   return typeof v === 'string' ? v.trim() : ''
 }
 
-function safeJsonParse(v: unknown, fallback: any) {
+function safeJsonParse(v, fallback) {
   try {
     if (typeof v !== 'string' || !v.trim()) return fallback
     return JSON.parse(v)
@@ -116,71 +111,16 @@ function safeJsonParse(v: unknown, fallback: any) {
   }
 }
 
-const app = express()
-
-// 1️⃣ (optional) DEBUG: log every request
-app.use((req, _res, next) => {
-  console.log(`[REQ] ${req.method} ${req.url} origin=${req.headers.origin || 'none'}`)
-  next()
-})
-
-// 2️⃣ CORS
-app.use(cors(corsOptions))
-app.options('*', cors(corsOptions))
-
-// 3️⃣ Body parsers
-app.use(express.json())
-
-// 4️⃣ Health
-app.get('/health', (_req, res) => {
-  res.set('Cache-Control', 'no-store')
-  res.status(200).json({ ok: true, ts: Date.now() })
-})
-
-// 🔎 5️⃣ DEBUG ROUTE — ADD IT HERE
-app.get('/api/debug', (req, res) => {
-  res.json({
-    ok: true,
-    message: 'Reached Express',
-    url: req.url,
-    origin: req.headers.origin || null,
-  })
-})
-
-// 6️⃣ Upload middleware
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-})
-
-// 7️⃣ Real endpoint
-app.post('/api/pin-image', upload.single('file'), async (req, res) => {
-  // ... your existing logic
-})
-
-// 8️⃣ (optional) DEBUG: catch-all 404 at VERY bottom
-app.use((req, res) => {
-  console.log(`[MISS] ${req.method} ${req.url}`)
-  res.status(404).json({
-    error: 'NOT_FOUND_IN_EXPRESS',
-    method: req.method,
-    url: req.url,
-  })
-})
-
-
 app.post('/api/pin-image', upload.single('file'), async (req, res) => {
   try {
     const file = req.file
     if (!file) return res.status(400).json({ error: 'No file uploaded' })
 
-    // Optional form fields (friendly for vibe-coders)
     const metaName = safeTrim(req.body?.metaName) || 'NFT Example'
     const metaDescription = safeTrim(req.body?.metaDescription) || 'Pinned via TokenizeRWA template'
     const properties = safeJsonParse(req.body?.properties, {})
 
-    // Pin image
-    const stream = Readable.from(file.buffer) as any
+    const stream = Readable.from(file.buffer)
     stream.path = file.originalname || 'upload'
 
     const imageResult = await pinata.pinFileToIPFS(stream, {
@@ -189,7 +129,6 @@ app.post('/api/pin-image', upload.single('file'), async (req, res) => {
 
     const imageUrl = `ipfs://${imageResult.IpfsHash}`
 
-    // Pin metadata JSON
     const metadata = {
       name: metaName,
       description: metaDescription,
@@ -201,28 +140,17 @@ app.post('/api/pin-image', upload.single('file'), async (req, res) => {
       pinataMetadata: { name: `${metaName} Metadata` },
     })
 
-    const metadataUrl = `ipfs://${jsonResult.IpfsHash}`
-
-    return res.status(200).json({ metadataUrl })
-  } catch (error: any) {
-    const msg =
-      error?.response?.data?.error ||
-      error?.response?.data ||
-      error?.message ||
-      'Failed to pin to IPFS.'
+    return res.status(200).json({ metadataUrl: `ipfs://${jsonResult.IpfsHash}` })
+  } catch (error) {
+    const msg = error?.response?.data?.error || error?.response?.data || error?.message || 'Failed to pin to IPFS.'
     return res.status(500).json({ error: msg })
   }
 })
 
-// --- DEBUG: catch-all so we can see if Express is being hit at all
+// Catch-all 404 (so we KNOW Express is being hit)
 app.use((req, res) => {
-  console.log(`[MISS] ${req.method} ${req.url} (no route matched)`)
-  res.status(404).json({
-    error: 'NOT_FOUND_IN_EXPRESS',
-    method: req.method,
-    url: req.url,
-  })
+  console.log(`[MISS] ${req.method} ${req.url}`)
+  res.status(404).json({ error: 'NOT_FOUND_IN_EXPRESS', method: req.method, url: req.url })
 })
-
 
 export default app
