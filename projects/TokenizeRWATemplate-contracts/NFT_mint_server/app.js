@@ -11,6 +11,13 @@ dotenv.config()
 
 const app = express()
 
+// --- DEBUG: log every request (shows up in Vercel function logs)
+app.use((req, _res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url} origin=${req.headers.origin || 'none'}`)
+  next()
+})
+
+
 /**
  * CORS
  * - Allows localhost dev
@@ -109,6 +116,59 @@ function safeJsonParse(v: unknown, fallback: any) {
   }
 }
 
+const app = express()
+
+// 1️⃣ (optional) DEBUG: log every request
+app.use((req, _res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url} origin=${req.headers.origin || 'none'}`)
+  next()
+})
+
+// 2️⃣ CORS
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
+
+// 3️⃣ Body parsers
+app.use(express.json())
+
+// 4️⃣ Health
+app.get('/health', (_req, res) => {
+  res.set('Cache-Control', 'no-store')
+  res.status(200).json({ ok: true, ts: Date.now() })
+})
+
+// 🔎 5️⃣ DEBUG ROUTE — ADD IT HERE
+app.get('/api/debug', (req, res) => {
+  res.json({
+    ok: true,
+    message: 'Reached Express',
+    url: req.url,
+    origin: req.headers.origin || null,
+  })
+})
+
+// 6️⃣ Upload middleware
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+})
+
+// 7️⃣ Real endpoint
+app.post('/api/pin-image', upload.single('file'), async (req, res) => {
+  // ... your existing logic
+})
+
+// 8️⃣ (optional) DEBUG: catch-all 404 at VERY bottom
+app.use((req, res) => {
+  console.log(`[MISS] ${req.method} ${req.url}`)
+  res.status(404).json({
+    error: 'NOT_FOUND_IN_EXPRESS',
+    method: req.method,
+    url: req.url,
+  })
+})
+
+
 app.post('/api/pin-image', upload.single('file'), async (req, res) => {
   try {
     const file = req.file
@@ -153,5 +213,16 @@ app.post('/api/pin-image', upload.single('file'), async (req, res) => {
     return res.status(500).json({ error: msg })
   }
 })
+
+// --- DEBUG: catch-all so we can see if Express is being hit at all
+app.use((req, res) => {
+  console.log(`[MISS] ${req.method} ${req.url} (no route matched)`)
+  res.status(404).json({
+    error: 'NOT_FOUND_IN_EXPRESS',
+    method: req.method,
+    url: req.url,
+  })
+})
+
 
 export default app
