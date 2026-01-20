@@ -3,7 +3,7 @@ import { OnSchemaBreak, OnUpdate } from '@algorandfoundation/algokit-utils/types
 import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { HelloWorldFactory } from '../contracts/HelloWorldClient'
+import { HelloWorldFactory } from '../contracts/HelloWorld'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
 interface AppCallsInterface {
@@ -24,8 +24,8 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
     indexerConfig,
   })
   if (transactionSigner) {
-    // @ts-expect-error - optional API depending on algokit-utils version
-    algorand.setDefaultSigner?.(transactionSigner)
+    // setDefaultSigner exists in algokit-utils v9
+    algorand.setDefaultSigner(transactionSigner)
   }
 
   const sendAppCall = async () => {

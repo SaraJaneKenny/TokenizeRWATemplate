@@ -1,4 +1,4 @@
-import { AlgorandClient } from '@algorandfoundation/algokit-utils'
+import { AlgorandClient, microAlgos } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
 import { sha512_256 } from 'js-sha512'
 import { useSnackbar } from 'notistack'
@@ -12,7 +12,7 @@ import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClien
  * Captures ASA configuration including compliance fields
  */
 type CreatedAsset = {
-  assetId: number
+  assetId: bigint
   assetName: string
   unitName: string
   total: string
@@ -267,9 +267,9 @@ export default function TokenizeAsset() {
       // Method 2: Fallback to account information API
       // Used when method 1 has non-404 errors or for verification
       const info = await algorand.client.algod.accountInformation(activeAddress).do()
-      const assets: Array<{ ['asset-id']: number; amount?: number }> = info?.assets ?? []
+      const assets: Array<{ assetId: bigint; amount?: number | bigint }> = info?.assets ?? []
 
-      const usdcHolding = assets.find((a) => a['asset-id'] === TESTNET_USDC_ASSET_ID)
+      const usdcHolding = assets.find((a) => a.assetId === BigInt(TESTNET_USDC_ASSET_ID))
 
       if (usdcHolding) {
         const balance = BigInt(usdcHolding.amount ?? 0)
@@ -406,7 +406,7 @@ export default function TokenizeAsset() {
       const result = await algorand.send.assetTransfer({
         sender: activeAddress,
         signer,
-        assetId: TESTNET_USDC_ASSET_ID,
+        assetId: BigInt(TESTNET_USDC_ASSET_ID),
         receiver: activeAddress,
         amount: 0n,
       })
@@ -570,7 +570,7 @@ export default function TokenizeAsset() {
       const assetId = createResult.assetId
 
       const newEntry: CreatedAsset = {
-        assetId: Number(assetId),
+        assetId: BigInt(assetId),
         assetName: String(assetName),
         unitName: String(unitName),
         total: String(total),
@@ -667,13 +667,11 @@ export default function TokenizeAsset() {
       if (transferMode === 'algo') {
         enqueueSnackbar('Sending ALGO...', { variant: 'info' })
 
-        const microAlgos = decimalToBaseUnits(transferAmount, ALGO_DECIMALS)
-
         const result = await algorand.send.payment({
           sender: activeAddress,
           signer,
           receiver: receiverAddress,
-          amount: algorand.microAlgos(microAlgos),
+          amount: microAlgos(decimalToBaseUnits(transferAmount, ALGO_DECIMALS)),
         })
 
         const txId = (result as { txId?: string }).txId
@@ -715,7 +713,7 @@ export default function TokenizeAsset() {
         const result = await algorand.send.assetTransfer({
           sender: activeAddress,
           signer,
-          assetId: TESTNET_USDC_ASSET_ID,
+          assetId: BigInt(TESTNET_USDC_ASSET_ID),
           receiver: receiverAddress,
           amount: usdcAmount,
         })
@@ -748,7 +746,7 @@ export default function TokenizeAsset() {
         const result = await algorand.send.assetTransfer({
           sender: activeAddress,
           signer,
-          assetId: Number(transferAssetId),
+          assetId: BigInt(transferAssetId),
           receiver: receiverAddress,
           amount: BigInt(transferAmount),
         })
@@ -893,7 +891,7 @@ export default function TokenizeAsset() {
 
       // ✅ Persist minted NFT into SAME history list (NFTs are ASAs)
       const nftEntry: CreatedAsset = {
-        assetId: Number(assetId),
+        assetId: BigInt(assetId),
         assetName: String(nftName),
         unitName: String(nftUnit),
         total: String(nftSupply),
@@ -1472,7 +1470,7 @@ export default function TokenizeAsset() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{a.assetId}</span>
+                          <span className="font-mono text-xs text-slate-700 dark:text-slate-300">{String(a.assetId)}</span>
                           <button
                             type="button"
                             className="px-2 py-1 text-[11px] rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
