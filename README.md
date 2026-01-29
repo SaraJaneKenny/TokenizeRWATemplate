@@ -13,22 +13,22 @@ No prior blockchain or smart contract experience required. By the end, you'll ha
 
 ## ✨ What This Template Gives You
 
-- ✅ Full-stack Algorand project (frontend + backend server - no smart contract logic used)
-- ✅ Simple ASA creation and transferring flow for assets
-- ✅ Web2 & Web3-style logins
-- ✅ TestNet-ready setup
-- ✅ One-command setup using GitHub Codespaces
-- ✅ Hosting capability with Vercel + Analytics enabled
+- ✅ Complete Algorand starter app (user interface + backend)
+- ✅ Simple flow to create and send Algorand assets (tokens)
+- ✅ Easy sign-in options (Email login + wallet login)
+- ✅ Ready to test on Algorand TestNet
+- ✅ Quick one-step setup (no complex installation)
+- ✅ Can be deployed online (Vercel), with analytics included
 
 ---
 
 ## 🧠 What "RWA Tokenization" Means Here
 
-This template focuses on the **on-chain token layer** of RWA tokenization:
+This template covers the blockchain “token” part of real-world asset (RWA) tokenization:
 
-- Each real-world asset is represented by an **Algorand Standard Asset (ASA)**
-- Ownership, supply, and transfers are handled on-chain
-- The real-world linkage (documents, custody, legal structure) lives off-chain
+- Each real-world asset is represented as an token on the Algorand blockchain (ASA)
+- Ownership, supply and transfers are tracked on the blockchain
+- The real-world paperwork (documents, custody, legal structure) stays off the blockchain
 
 > ⚠️ This is a technical proof-of-concept template, not legal or financial advice.
 
@@ -36,7 +36,7 @@ This template focuses on the **on-chain token layer** of RWA tokenization:
 
 ## 🚀 Getting Started (5 Minutes)
 
-### Option 1: GitHub Codespaces (Recommended)
+### Option 1: [GitHub Codespaces](https://github.com/features/codespaces) (Recommended)
 
 This is the fastest and easiest way to run the project.
 
@@ -67,9 +67,9 @@ bash setup.sh
 ```
 
 This script will:
-- Install dependencies
-- Automatically create required environment files
-- Launch the frontend automatically
+- Install everything needed
+- Set up the required files automatically
+- Start the app for you (open the website)
 
 👉 When it finishes, a web app link will open automatically in Codespaces.
 
@@ -77,9 +77,9 @@ This script will:
 
 ---
 
-## 🔐 Required Frontend Configuration (Web3Auth)
+## 🔐 Web3Auth setup required
 
-To enable email / social (Web2-style) login, you must configure Web3Auth.
+To enable email/social login, you must configure Web3Auth in your Web3Auth dashboard first.
 
 ### Steps
 
@@ -103,16 +103,23 @@ VITE_WEB3AUTH_CLIENT_ID=YOUR_CLIENT_ID_HERE
 
 Save the file and restart the frontend if it's already running.
 
-> 🔑 **This is the only required manual environment step.**
+### Once your website is open in your browser, copy the website link (URL).
+
+Next, go to your Web3Auth Dashboard. Inside your project settings, find Domains and paste your website link there, just like in the screenshot below. Click Add URL.
+
+This step is very important — it allows the Web3Auth wallet to work properly on your website.
+
+<img width="2908" height="1270" alt="image" src="https://github.com/user-attachments/assets/9e42fe72-02bb-4d2e-a29d-0fca3ccca272" />
 
 ---
 
 ## 🖼 Optional: NFT Minting (IPFS / Pinata)
 
-NFT minting and metadata uploads are handled by a small backend server.
+If you want to create NFTs (with images/metadata), you’ll need to set up a small backend service for uploads.
 
-> ⚠️ **ONLY required if you want NFT / metadata minting**  
-> If you're just creating and transferring ASAs, you can skip this section.
+> ⚠️ Only do this if you plan to mint NFTs and upload metadata.
+
+#### If you’re only creating tokens or transfering tokens, you can skip this section.
 
 ### Backend path
 
