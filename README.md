@@ -151,9 +151,8 @@ Save the file.
 
 ---
 
-## 🌐 Running the Frontend Again
-
-After running `setup.sh` once, you have two options whenever you open your Codespace if you don't want to run the setup script again:
+## 🌐 Starting the app again
+After you run setup.sh once, you have two simple options each time you reopen your Codespace - so you don’t need to run the setup again:
 
 ### Option A: Terminal
 
@@ -167,29 +166,29 @@ npm run dev
 You can also start the frontend directly using the GitHub Codespaces UI, which is useful for demos and workshops.
 
 ## Pro Tip!
-GitHub Codespaces is included with free accounts but comes with a monthly limit of 60 hours. 
-
-To avoid losing your progress, be sure to **commit AND sync your changes regularly** — just like shown in the video demo below — so your updates are saved to your forked repository.
+GitHub Codespaces is available on free accounts, but it includes up to 60 hours per month.
+To avoid losing your work, commit and sync your changes regularly (as shown in the demo video) so everything is saved to your forked repository.
+#### A “commit” is like hitting save with a short note, it records your changes in Git so you can keep them and come back to them later.
 
 https://github.com/user-attachments/assets/dd452ea1-3070-4718-af34-bea978e208ab
 
 ---
 
-## 🧠 Final Note (Important for Learners)
+## 🧠  Final note (important)
+- ✅ The app setup is mostly automatic
+- ✅ You must add a Web3Auth Client ID (to use the app/login)
+- ✅ Pinata is optional (only for NFT images/metadata)
 
-- ✅ Frontend setup is fully automated
-- ✅ Web3Auth Client ID is **required**
-- ✅ Pinata is **optional**
+### If something isn’t working, it’s usually because:
+- Your Web3Auth Client ID is missing
+- You don’t have TestNet ALGO or USDC in your wallet
 
-**If something isn't working, it's almost always because of:**
-- A missing Web3Auth Client ID
-- No TestNet ALGO or USDC
 
 ---
 
 ## 🪙 Tokenization Flow (High Level)
 
-This template guides you through the core steps of tokenizing a real-world asset on Algorand using Algorand Standard Assets (ASAs).
+This template walks you through the basic steps to represent a real-world asset as a token on the Algorand blockchain (ASA).
 
 ### Basic Flow
 
